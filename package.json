@@ -1,0 +1,22 @@
+{
+  "name": "playwright-api-testing",
+  "version": "1.0.0",
+  "description": "Simple and scalable Playwright API automation testing project in JavaScript",
+  "main": "index.js",
+  "scripts": {
+    "test": "playwright test",
+    "test:debug": "playwright test --debug",
+    "test:report": "playwright show-report"
+  },
+  "keywords": [
+    "playwright",
+    "api-testing",
+    "javascript"
+  ],
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "@playwright/test": "^1.45.0",
+    "dotenv": "^16.4.5"
+  }
+}

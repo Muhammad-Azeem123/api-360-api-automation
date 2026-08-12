@@ -1,0 +1,20 @@
+# Dependencies
+node_modules/
+
+# Local Environment Variables
+.env
+
+# Playwright Test Outputs
+playwright-report/
+test-results/
+playwright/.cache/
+
+# Local tokens and configurations
+storage/
+
+# IDE/Agent scratch files
+scratch/
+
+# Log files
+*.log
+
