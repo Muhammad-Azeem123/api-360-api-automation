@@ -85,7 +85,26 @@ playwright-api/
 
 ---
 
-## 2. File Responsibilities & Purposes
+## 2. Setup and Environment Configuration
+
+To run these tests locally, you need to configure your local environment variables.
+
+1. **Copy the template file**:
+   ```bash
+   cp .env.example .env
+   ```
+2. **Configure your credentials**:
+   Open the newly created `.env` file and fill in the authorization tokens and base URL:
+   - `BASE_URL`: The target API host (e.g. `https://apis-dev.api360.sa/portaldev/api`).
+   - `USER_AUTHORIZATION_TOKEN`: Active Bearer Token for standard user authorization.
+   - `ADMIN_AUTHORIZATION_TOKEN`: Active Bearer Token for admin/operations authorization.
+
+> [!IMPORTANT]
+> The `.env` file contains sensitive credentials and is explicitly ignored in `.gitignore`. Never commit `.env` or any other files containing tokens directly to the repository.
+
+---
+
+## 3. File Responsibilities & Purposes
 
 ### The Authentication Core (`auth/`)
 * **`baseApiClient.js`**: Shared blueprint class defining standard HTTP methods (GET, POST, PUT, DELETE, PATCH). It handles the setup of headers and ensures that request connections are cleanly disposed of.
@@ -102,7 +121,7 @@ playwright-api/
 
 ---
 
-## 3. Core Operational Logics & Workflows
+## 4. Core Operational Logics & Workflows
 
 ### The Global Setup Sequence
 Before executing tests, Playwright runs the setup hook (`utils/global-setup.js`):
@@ -112,7 +131,7 @@ Before executing tests, Playwright runs the setup hook (`utils/global-setup.js`)
 
 ---
 
-## 4. End-to-End Workflow Scenario: Create, Approve & Publish API Product
+## 5. End-to-End Workflow Scenario: Create, Approve & Publish API Product
 
 The framework demonstrates dynamic, cross-role API workflows (creating as User, approving as Admin, and publishing as User):
 
@@ -140,7 +159,7 @@ graph TD
 
 ---
 
-## 5. Running and Debugging Tests
+## 6. Running and Debugging Tests
 
 Ensure your `.env` contains correct credentials, then execute the following standard scripts:
 
