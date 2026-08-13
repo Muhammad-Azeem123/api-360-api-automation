@@ -41,21 +41,34 @@ playwright-api/
 │   │   ├── API-Products/
 │   │   │   ├── Paid-API-product/
 │   │   │   │   ├── Paid_API_Product_Endpoint_Pricing_No_Tier.spec.js # E2E flat endpoint pricing workflow
+│   │   │   │   ├── Published_Paid_API_Product_Endpoint_Pricing_No_Tier.spec.js # E2E flat endpoint pricing workflow + Publish
 │   │   │   │   ├── Paid_API_Product_Endpoint_Pricing_Tier.spec.js    # E2E tier endpoint pricing workflow
+│   │   │   │   ├── Published_Paid_API_Product_Endpoint_Pricing_Tier.spec.js    # E2E tier endpoint pricing workflow + Publish
 │   │   │   │   ├── Paid_API_Product_Request_Based_Plan.spec.js       # E2E request-based pricing workflow
-│   │   │   │   └── Paid_API_Product_with_plan-as-package.spec.js     # E2E package pricing workflow
+│   │   │   │   ├── Published_Paid_API_Product_Request_Based_Plan.spec.js       # E2E request-based pricing workflow + Publish
+│   │   │   │   ├── Paid_API_Product_with_plan-as-package.spec.js     # E2E package pricing workflow
+│   │   │   │   └── Published_Paid_API_Product_Plan_As_A_Package.spec.js # E2E package pricing workflow + Publish
 │   │   │   │
 │   │   │   ├── Paid BYOK Product/
 │   │   │   │   ├── Paid-BYOK-Product-endpoint-pricing-no-tier.spec.js # E2E flat endpoint pricing BYOK workflow
+│   │   │   │   ├── Published_Paid_BYOK_Product_Endpoint_Pricing_No_Tier.spec.js # E2E flat endpoint pricing BYOK workflow + Publish
 │   │   │   │   ├── Paid-BYOK-Product-endpoint-pricing-tier.spec.js    # E2E tier endpoint pricing BYOK workflow
+│   │   │   │   ├── Published_Paid_BYOK_Product_Endpoint_Pricing_Tier.spec.js    # E2E tier endpoint pricing BYOK workflow + Publish
 │   │   │   │   ├── Paid-BYOK-Product-plan-as-a-package.spec.js        # E2E package pricing BYOK workflow
-│   │   │   │   └── Paid-BYOK-Product-plan-base-on-No.-of-request.spec.js # E2E request-based BYOK workflow
+│   │   │   │   ├── Published_Paid_BYOK_Product_Plan_As_A_Package.spec.js        # E2E package pricing BYOK workflow + Publish
+│   │   │   │   ├── Paid-BYOK-Product-plan-base-on-No.-of-request.spec.js # E2E request-based BYOK workflow
+│   │   │   │   └── Published_Paid_BYOK_Product_Plan_Based_On_Number_Of_Requests.spec.js # E2E request-based BYOK workflow + Publish
 │   │   │   │
 │   │   │   ├── Free-API-product/
-│   │   │   │   └── Free_API_Product.spec.js                           # E2E Free API product workflow
+│   │   │   │   ├── Free_API_Product.spec.js                           # E2E Free API product workflow
+│   │   │   │   └── Published_Free_API_Product.spec.js                 # E2E Free API product workflow + Publish
 │   │   │   │
 │   │   │   └── Free BYOK Product/
-│   │   │       └── Free_BYOK_Product.spec.js                          # E2E Free BYOK Product workflow
+│   │   │       ├── Free_BYOK_Product.spec.js                          # E2E Free BYOK Product workflow
+│   │   │       └── Published_Free_BYOK_Product.spec.js                # E2E Free BYOK Product workflow + Publish
+│   │   │
+│   │   ├── Published_module/
+│   │   │   └── Published_the_API_Product.spec.js                  # Reusable Publish API Product module
 │   │   │
 │   │   └── pricing-plan/
 │   │       ├── endpoint-pricing-no-tier.js   # Helper to configure flat endpoint pricing
@@ -116,8 +129,9 @@ To run these tests locally, you need to configure your local environment variabl
 
 ### Testing Suites & Helper Modules (`tests/`)
 * **`tests/admin/Approve_API_Product/approveAPIProduct.js`**: The Admin API Product Approval module. It dynamically fetches pending count, identifies the project category/ID from the projects list, resolves the `'Test_Service_Azy_001'` service provider ID, and approves the API product (status `"accepted"`).
+* **`tests/Users/Published_module/Published_the_API_Product.spec.js`**: Reusable module to publish an API Product. It queries project details via GET and submits a PATCH request to set `"published": true`.
 * **`tests/Users/pricing-plan/`**: Reusable modules to configure pricing plans (Package Plan, Request-Based Plan, and Endpoint Pricing with/without tiers) in product creation test runs.
-* **`tests/Users/API-Products/`**: Houses E2E specs for creating both Free and Paid products (BYOK and standard API formats) using the pricing plan helpers.
+* **`tests/Users/API-Products/`**: Houses E2E specs for creating both Free and Paid products (BYOK and standard API formats) using the pricing plan helpers, as well as the 10 corresponding `Published_...` specs that automate the full creation sequence followed by final product publication.
 
 ---
 
@@ -144,6 +158,7 @@ graph TD
     E --> F[User: Get default Version & Submit Version]
     F --> G[Admin: Approve Version via approve-api.spec]
     G --> H[User: Publish Version]
+    H --> I[User: Publish API Product via publishAPIProduct]
 ```
 
 1. **Create Product (User)**: Fetches lookups, generates an URL-compliant prefix, and sends a `POST /portaldev/api/projects` request.
@@ -156,6 +171,7 @@ graph TD
 4. **Submit Version (User)**: Submits the version to transition status to `pending_review`.
 5. **Approve Version (Admin)**: Invokes the admin version review test suite to approve the submitted API version.
 6. **Publish Version (User)**: Sends a `POST /versions/{id}/publish` request to mark the API product version active and live.
+7. **Publish API Product (User)**: Calls the reusable `publishAPIProduct` module to send a `PATCH /portaldev/api/projects/{projectId}` setting `published: true`, rendering the API Product published and active.
 
 ---
 
