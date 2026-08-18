@@ -38,6 +38,9 @@ playwright-api/
 │
 ├── tests/
 │   ├── Users/
+│   │   ├── Delete API Product/
+│   │   │   └── deleteApiProducts.spec.js      # Cleanup task to delete all API Products/projects
+│   │   │
 │   │   ├── API-Products/
 │   │   │   ├── Paid-API-product/
 │   │   │   │   ├── Paid_API_Product_Endpoint_Pricing_No_Tier.spec.js # E2E flat endpoint pricing workflow
@@ -131,6 +134,7 @@ To run these tests locally, you need to configure your local environment variabl
 * **`tests/admin/Approve_API_Product/approveAPIProduct.js`**: The Admin API Product Approval module. It dynamically fetches pending count, identifies the project category/ID from the projects list, resolves the `'Test_Service_Azy_001'` service provider ID, and approves the API product (status `"accepted"`).
 * **`tests/Users/Published_module/Published_the_API_Product.spec.js`**: Reusable module to publish an API Product. It queries project details via GET and submits a PATCH request to set `"published": true`.
 * **`tests/Users/pricing-plan/`**: Reusable modules to configure pricing plans (Package Plan, Request-Based Plan, and Endpoint Pricing with/without tiers) in product creation test runs.
+* **`tests/Users/Delete API Product/deleteApiProducts.spec.js`**: Cleanup task that deletes all API Products/projects from the system. It retrieves all paginated projects, deduplicates project IDs, sends DELETE requests with a reason payload, and skips individual errors.
 * **`tests/Users/API-Products/`**: Houses E2E specs for creating both Free and Paid products (BYOK and standard API formats) using the pricing plan helpers, as well as the 10 corresponding `Published_...` specs that automate the full creation sequence followed by final product publication.
 
 ---
@@ -185,6 +189,9 @@ npx playwright test
 
 # Run a specific E2E product creation workflow (which automatically triggers the admin approval module)
 npx playwright test "tests/Users/API-Products/Paid BYOK Product/Paid-BYOK-Product-endpoint-pricing-no-tier.spec.js"
+
+# Run the Cleanup script to delete all API Products/projects from the system
+npx playwright test "tests/Users/Delete API Product/deleteApiProducts.spec.js"
 
 # Generate and view test execution reports
 npx playwright show-report
