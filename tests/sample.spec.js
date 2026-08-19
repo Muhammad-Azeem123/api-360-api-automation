@@ -5,7 +5,7 @@ const apiClient = require('../utils/apiClient');
 test.describe('API to fetch Apps', () => {
 
   test('should fetch Apps and return 200', async () => {
-    const endpoint = '/portaldev/api/apps';
+    const endpoint = '/api/apps';
     console.log(`[Request] GET -> ${endpoint}`);
 
     // Reusable apiClient singleton automatically retrieves and injects the active Bearer token.

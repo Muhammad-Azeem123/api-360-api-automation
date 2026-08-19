@@ -15,7 +15,7 @@ async function createPackagePlan(projectId) {
   }
 
   // Step 1: Verify whether a Package pricing plan already exists
-  const getPlansUrl = `/portaldev/api/projects/${projectId}/plans`;
+  const getPlansUrl = `${apiClient.apiPrefix}/projects/${projectId}/plans`;
   console.log(`[${helperName}] [Step 1] Fetching existing pricing plans from GET ${getPlansUrl}...`);
   const getPlansResponse = await apiClient.get(getPlansUrl);
   console.log(`[${helperName}] [Step 1] Response status: ${getPlansResponse.status}`);
@@ -36,7 +36,7 @@ async function createPackagePlan(projectId) {
   }
 
   // Step 2: Fee Preview calculation
-  const previewUrl = `/portaldev/api/projects/${projectId}/plans/fee-preview`;
+  const previewUrl = `${apiClient.apiPrefix}/projects/${projectId}/plans/fee-preview`;
   const previewPayload = {
     type: "package",
     number_of_requests: 1000,
@@ -69,7 +69,7 @@ async function createPackagePlan(projectId) {
   console.log(`- Price Per Request: ${pricePerRequest}`);
 
   // Step 3: Save the actual pricing plan
-  const saveUrl = `/portaldev/api/projects/${projectId}/plans`;
+  const saveUrl = `${apiClient.apiPrefix}/projects/${projectId}/plans`;
   const savePayload = {
     type: "package",
     name: "Package 1",

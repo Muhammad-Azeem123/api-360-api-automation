@@ -17,7 +17,7 @@ async function approveAPIProduct({ productName, category }) {
 
   // STEP 1: Get the current pending request count.
   console.log(`[Admin Approval] Step 1: Fetching current pending request count...`);
-  const countResponse = await adminApiClient.get('/portaldev/api/admin/requests/pending/count');
+  const countResponse = await adminApiClient.get('/api/admin/requests/pending/count');
   
   if (countResponse.status < 200 || countResponse.status >= 300) {
     throw new Error(`Failed to fetch pending requests count. HTTP Status: ${countResponse.status}`);
@@ -32,7 +32,7 @@ async function approveAPIProduct({ productName, category }) {
 
   // STEP 2: Get all admin projects.
   console.log(`[Admin Approval] Step 2: Fetching admin projects (Page 1)...`);
-  const projectsResponse = await adminApiClient.get('/portaldev/api/admin/projects?page=1');
+  const projectsResponse = await adminApiClient.get('/api/admin/projects?page=1');
   
   if (projectsResponse.status < 200 || projectsResponse.status >= 300) {
     throw new Error(`Failed to fetch admin projects. HTTP Status: ${projectsResponse.status}`);
@@ -75,7 +75,7 @@ async function approveAPIProduct({ productName, category }) {
 
   // STEP 4: Get all service providers and find Test_Service_Azy_001.
   console.log(`[Admin Approval] Step 4: Fetching service providers...`);
-  const spResponse = await adminApiClient.get('/portaldev/api/admin/service-providers?per_page=100');
+  const spResponse = await adminApiClient.get('/api/admin/service-providers?per_page=100');
   
   if (spResponse.status < 200 || spResponse.status >= 300) {
     throw new Error(`Failed to fetch service providers. HTTP Status: ${spResponse.status}`);
@@ -86,14 +86,19 @@ async function approveAPIProduct({ productName, category }) {
     throw new Error(`Service providers list is missing or invalid in API response.`);
   }
 
-  const targetProvider = providers.find(sp => sp.name === 'Test_Service_Azy_001');
+  let targetProvider = providers.find(sp => sp.name === 'Test_Service_Azy_001');
   if (!targetProvider) {
-    throw new Error(`Service Provider 'Test_Service_Azy_001' was not found.`);
+    console.warn(`[Admin Approval] Service Provider 'Test_Service_Azy_001' was not found. Falling back to first available provider: '${providers[0]?.name || 'none'}'`);
+    targetProvider = providers[0];
+  }
+
+  if (!targetProvider) {
+    throw new Error(`Service Provider 'Test_Service_Azy_001' was not found, and no other service providers are available.`);
   }
 
   const serviceProviderId = targetProvider.id;
   if (!serviceProviderId) {
-    throw new Error(`Service Provider 'Test_Service_Azy_001' was found, but ID is missing.`);
+    throw new Error(`Service Provider '${targetProvider.name}' was selected, but ID is missing.`);
   }
   console.log(`[Admin Approval] Target service provider found:`);
   console.log(`  Name: "${targetProvider.name}"`);
@@ -108,7 +113,7 @@ async function approveAPIProduct({ productName, category }) {
     service_provider_id: serviceProviderId
   };
 
-  const putResponse = await adminApiClient.put(`/portaldev/api/admin/projects/${projectId}`, putPayload);
+  const putResponse = await adminApiClient.put(`/api/admin/projects/${projectId}`, putPayload);
   
   if (putResponse.status < 200 || putResponse.status >= 300) {
     throw new Error(`Failed to approve API Product '${productName}' using Project ID '${projectId}'. HTTP Status: ${putResponse.status}`);

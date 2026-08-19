@@ -15,7 +15,7 @@ async function createRequestBasedPlan(projectId) {
   }
 
   // Step 1: Verify existing pricing plans
-  const getPlansUrl = `/portaldev/api/projects/${projectId}/plans`;
+  const getPlansUrl = `${apiClient.apiPrefix}/projects/${projectId}/plans`;
   console.log(`[${helperName}] [Step 1] Fetching existing pricing plans from GET ${getPlansUrl}...`);
   const getPlansResponse = await apiClient.get(getPlansUrl);
   console.log(`[${helperName}] [Step 1] Response status: ${getPlansResponse.status}`);
@@ -36,7 +36,7 @@ async function createRequestBasedPlan(projectId) {
   }
 
   // Step 2: Fee Preview calculation
-  const previewUrl = `/portaldev/api/projects/${projectId}/plans/fee-preview`;
+  const previewUrl = `${apiClient.apiPrefix}/projects/${projectId}/plans/fee-preview`;
   const previewPayload = {
     type: "plan",
     pricing_segments: [
@@ -67,7 +67,7 @@ async function createRequestBasedPlan(projectId) {
   // Step 3: Save the actual pricing plan
   // TODO: The complete payload for the Save request below must be completed after inspecting the browser Network tab request.
   // Do NOT invent fields. Ensure the fields match the exact structure captured.
-  const saveUrl = `/portaldev/api/projects/${projectId}/plans`;
+  const saveUrl = `${apiClient.apiPrefix}/projects/${projectId}/plans`;
   const savePayload = {
     type: "plan",
     name: "Request Based Plan 1",

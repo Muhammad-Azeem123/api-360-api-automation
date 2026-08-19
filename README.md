@@ -181,18 +181,67 @@ graph TD
 
 ## 6. Running and Debugging Tests
 
-Ensure your `.env` contains correct credentials, then execute the following standard scripts:
+The framework supports both **DEV** and **STAGING** environments with complete isolation of environment configurations, URL resolution, and authentication token storage.
+
+### Supported Environments
+
+| Environment | Base URL | Config File | Token Cache Directory |
+| :--- | :--- | :--- | :--- |
+| **DEV** | `https://apis-dev.api360.sa/portaldev/api` | `.env` | `storage/` |
+| **STAGING** | `https://apis-stg.api360.sa/portalstg/api/` | `.env.stg` | `storage/staging/` |
+
+### Environment Configuration
+
+Configure credentials using separate environment files. Copies of these configurations are ignored by Git for security.
+
+1. **DEV Configuration (`.env`)**:
+   Ensure `.env` contains:
+   ```env
+   BASE_URL=https://apis-dev.api360.sa/portaldev/api
+   USER_AUTHORIZATION_TOKEN=<DEV_USER_REFRESH_TOKEN>
+   ADMIN_AUTHORIZATION_TOKEN=<DEV_ADMIN_REFRESH_TOKEN>
+   ```
+
+2. **STAGING Configuration (`.env.stg`)**:
+   Ensure `.env.stg` contains:
+   ```env
+   BASE_URL=https://apis-stg.api360.sa/portalstg/api/
+   USER_AUTHORIZATION_TOKEN=<STAGING_USER_REFRESH_TOKEN>
+   ADMIN_AUTHORIZATION_TOKEN=<STAGING_ADMIN_REFRESH_TOKEN>
+   ```
+
+### Running Tests
+
+Run tests using the cross-platform environment test runner:
 
 ```bash
-# Run all tests sequentially
-npx playwright test
+# Run DEV tests sequentially
+npm run test:dev
 
-# Run a specific E2E product creation workflow (which automatically triggers the admin approval module)
-npx playwright test "tests/Users/API-Products/Paid BYOK Product/Paid-BYOK-Product-endpoint-pricing-no-tier.spec.js"
+# Run STAGING tests sequentially
+npm run test:stg
 
-# Run the Cleanup script to delete all API Products/projects from the system
-npx playwright test "tests/Users/Delete API Product/deleteApiProducts.spec.js"
+# Run a specific spec on DEV (forward extra Playwright arguments)
+npm run test:dev -- tests/Users/API-Products/Free-API-product/Free_API_Product.spec.js
 
-# Generate and view test execution reports
-npx playwright show-report
+# Run a specific spec on STAGING (forward extra Playwright arguments)
+npm run test:stg -- tests/Users/API-Products/Free-API-product/Free_API_Product.spec.js
+
+# Run tests in Playwright debug mode
+npm run test:dev -- --debug
+npm run test:stg -- --debug
+
+# View reports
+npm run test:report
 ```
+
+### Token Storage & Isolation
+
+Authentication tokens for each environment are stored in separate directories. Running tests in one environment will never read, write, or overwrite the credentials of the other environment:
+- **DEV User Token**: `storage/user-token.json`
+- **DEV Admin Token**: `storage/admin-token.json`
+- **STAGING User Token**: `storage/staging/user-token.json`
+- **STAGING Admin Token**: `storage/staging/admin-token.json`
+
+The global setup script automatically detects the active environment via `ENV=dev` or `ENV=stg`, loads the correct configuration file, and isolates token storage locations. Furthermore, API Client requests automatically route `/portaldev/api` endpoints to `/portalstg/api` when running in the STAGING environment via a dynamic Proxy rewriter, allowing the same test suites to execute against either environment unchanged.
+

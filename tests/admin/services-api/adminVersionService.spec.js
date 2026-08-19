@@ -6,7 +6,7 @@ test.describe('Admin Version Service', () => {
     // Fetch first page of versions
     console.log(`----------------------------------------`);
     console.log(`Fetching submitted versions (Page: 1, PageSize: 100)...`);
-    const response = await adminApiClient.get('/portaldev/api/admin/versions?page=1&pageSize=100');
+    const response = await adminApiClient.get('/api/admin/versions?page=1&pageSize=100');
     
     expect(response.status).toBe(200);
     expect(response.body).toBeDefined();

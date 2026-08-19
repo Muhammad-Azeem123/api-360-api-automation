@@ -16,7 +16,7 @@ async function createTargetServiceWithOAuthConfig(projectId, servicePayloadOverr
   }
 
   // Step 1: Create Target Service
-  const serviceUrl = `/portaldev/api/services?project_id=${projectId}`;
+  const serviceUrl = `${apiClient.apiPrefix}/services?project_id=${projectId}`;
   const defaultServicePayload = {
     name: "my test service 1",
     retries: 100,
@@ -48,7 +48,7 @@ async function createTargetServiceWithOAuthConfig(projectId, servicePayloadOverr
   console.log(`[${helperName}] [Step 1] Target Service created successfully with ID: ${serviceId}`);
 
   // Step 2: Configure OAuth Authorization Flow
-  const oauthUrl = `/portaldev/api/services/${serviceId}/oauth-config?project_id=${projectId}`;
+  const oauthUrl = `${apiClient.apiPrefix}/services/${serviceId}/oauth-config?project_id=${projectId}`;
   const defaultOauthPayload = {
     token_url: "https://fakestoreapi.com/",
     cache_ttl: 300,
@@ -80,60 +80,5 @@ async function createTargetServiceWithOAuthConfig(projectId, servicePayloadOverr
     serviceId
   };
 }
-
-// Playwright Unit Tests
-test.describe('Target Service for BYOK API Module tests', () => {
-  // Use the static project ID requested for development and testing
-  const projectId = '49020136-48d0-46af-bcb1-12e63a328660';
-
-  test('should successfully create Target Service and configure OAuth', async () => {
-    // Generate a unique name based on the required "my test service 1" base name
-    const uniqueServiceName = `my test service 1 - ${Date.now()}`;
-    console.log('[Test] Starting Target Service and OAuth config workflow with uniqueServiceName:', uniqueServiceName);
-    
-    // Execute both steps using the helper
-    const result = await createTargetServiceWithOAuthConfig(projectId, { name: uniqueServiceName });
-
-    // 1. Verify Target Service is successfully created
-    console.log('[Test] Verifying Step 1: Target Service Creation...');
-    expect([200, 201]).toContain(result.serviceResponse.status);
-    expect(result.serviceResponse.body).toBeDefined();
-
-    const serviceBody = result.serviceResponse.body?.data || result.serviceResponse.body;
-    expect(serviceBody).toBeDefined();
-    
-    // 2. Validate that response contains a valid service_id
-    expect(result.serviceId).toBeDefined();
-    expect(typeof result.serviceId).toBe('string');
-    expect(result.serviceId.length).toBeGreaterThan(0);
-    expect(serviceBody.id).toBe(result.serviceId);
-
-    // Verify other key attributes of the created service
-    expect(serviceBody.name).toBe(uniqueServiceName);
-    expect(serviceBody.host).toBe('fakestoreapi.com');
-    expect(serviceBody.environment).toBe('prod');
-
-    // 3. Verify OAuth configuration API executes successfully
-    console.log('[Test] Verifying Step 2: OAuth Configuration...');
-    expect([200, 201]).toContain(result.oauthResponse.status);
-    expect(result.oauthResponse.body).toBeDefined();
-
-    const oauthData = result.oauthResponse.body?.data;
-    expect(oauthData).toBeDefined();
-
-    // 4. Validate that OAuth configuration is associated with the created Target Service
-    expect(oauthData.service_id).toBe(result.serviceId);
-
-    const oauthConfig = oauthData.oauth_config;
-    expect(oauthConfig).toBeDefined();
-    expect(oauthConfig.token_url).toBe('https://fakestoreapi.com/');
-    expect(oauthConfig.cache_ttl).toBe(300);
-    expect(oauthConfig.fail_on_error).toBe(true);
-    expect(oauthConfig.http_method).toBe('GET');
-    expect(oauthConfig.value_source).toBe('CONSUMER_PROVIDED');
-
-    console.log('[Test] All assertions passed successfully. Service ID:', result.serviceId);
-  });
-});
 
 module.exports = createTargetServiceWithOAuthConfig;

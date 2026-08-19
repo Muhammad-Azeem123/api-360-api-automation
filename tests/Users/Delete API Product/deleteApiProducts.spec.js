@@ -26,7 +26,7 @@ test.describe('Cleanup All API Products', () => {
     console.log('\n[Delete API Products] --- STEP 1: Retrieving All Projects ---');
 
     while (hasMorePages) {
-      const endpoint = `/portaldev/api/projects?page=${page}&per_page=${perPage}`;
+      const endpoint = `${apiClient.apiPrefix}/projects?page=${page}&per_page=${perPage}`;
       console.log(`[Delete API Products] GET ${endpoint}`);
       
       let response;
@@ -88,7 +88,7 @@ test.describe('Cleanup All API Products', () => {
       try {
         context = await apiClient.getRequestContext();
         // Send DELETE with the delete reason in the body
-        const response = await context.delete(`/portaldev/api/projects/${projectId}`, {
+        const response = await context.delete(`${apiClient.apiPrefix}/projects/${projectId}`, {
           data: { delete_reason: deleteReason }
         });
         

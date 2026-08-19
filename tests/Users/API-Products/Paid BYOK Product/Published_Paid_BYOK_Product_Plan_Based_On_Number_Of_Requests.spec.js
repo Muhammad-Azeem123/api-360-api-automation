@@ -50,7 +50,7 @@ test.describe('Publish Paid BYOK API Product Workflow with Request-Based Plan', 
     // Step 1: Fetch lookup categories
     await test.step('GET /api/lookups/categories -> Fetch lookup categories', async () => {
       console.log(`[Step 1] Fetching lookup categories...`);
-      const response = await apiClient.get('/portaldev/api/lookups/category');
+      const response = await apiClient.get('/api/lookups/category');
 
       console.log(`[Step 1] Response status: ${response.status}`);
       expect(response.status).toBe(200);
@@ -90,7 +90,7 @@ test.describe('Publish Paid BYOK API Product Workflow with Request-Based Plan', 
       const valResult = validatePrefix(prefix);
       expect(valResult.valid).toBe(true);
 
-      const endpoint = `/portaldev/api/projects/check-prefix?prefix=${prefix}`;
+      const endpoint = `/api/projects/check-prefix?prefix=${prefix}`;
       console.log(`[Step 2] Calling GET ${endpoint}...`);
       const response = await apiClient.get(endpoint);
 
@@ -121,7 +121,7 @@ test.describe('Publish Paid BYOK API Product Workflow with Request-Based Plan', 
       };
 
       console.log(`[Step 3] Creating project with payload:`, JSON.stringify(payload, null, 2));
-      const response = await apiClient.post('/portaldev/api/projects', payload);
+      const response = await apiClient.post('/api/projects', payload);
 
       console.log(`[Step 3] Response status: ${response.status}`);
       if (response.status !== 201) {
@@ -183,9 +183,9 @@ test.describe('Publish Paid BYOK API Product Workflow with Request-Based Plan', 
     });
 
     // Step 5: Get Project Details
-    await test.step('GET /portaldev/api/projects/{projectId} -> Get Project Details', async () => {
+    await test.step('GET /api/projects/{projectId} -> Get Project Details', async () => {
       console.log(`[Step 5] Fetching project details for ID: ${projectId}...`);
-      const response = await apiClient.get(`/portaldev/api/projects/${projectId}`);
+      const response = await apiClient.get(`/api/projects/${projectId}`);
 
       console.log(`[Step 5] Response status: ${response.status}`);
       if (response.status !== 200) {
@@ -197,8 +197,8 @@ test.describe('Publish Paid BYOK API Product Workflow with Request-Based Plan', 
     });
 
     // Step 6: Verify Existing Endpoints
-    await test.step('GET /portaldev/api/projects/{projectId}/endpoint-pricing/endpoints -> Verify Existing Endpoints', async () => {
-      const endpoint = `/portaldev/api/projects/${projectId}/endpoint-pricing/endpoints`;
+    await test.step('GET /api/projects/{projectId}/endpoint-pricing/endpoints -> Verify Existing Endpoints', async () => {
+      const endpoint = `/api/projects/${projectId}/endpoint-pricing/endpoints`;
       console.log(`[Step 6] Verifying existing endpoints...`);
       const response = await apiClient.get(endpoint);
 
@@ -218,8 +218,8 @@ test.describe('Publish Paid BYOK API Product Workflow with Request-Based Plan', 
     });
 
     // Step 7: Verify Existing Pricing Plans
-    await test.step('GET /portaldev/api/projects/{projectId}/plans -> Verify Existing Pricing Plans', async () => {
-      const endpoint = `/portaldev/api/projects/${projectId}/plans`;
+    await test.step('GET /api/projects/{projectId}/plans -> Verify Existing Pricing Plans', async () => {
+      const endpoint = `/api/projects/${projectId}/plans`;
       console.log(`[Step 7] Verifying existing pricing plans...`);
       const response = await apiClient.get(endpoint);
 
@@ -239,8 +239,8 @@ test.describe('Publish Paid BYOK API Product Workflow with Request-Based Plan', 
     });
 
     // Step 8: Check Existing Groups
-    await test.step('GET /portaldev/api/groups?project_id={projectId} -> Check Existing Groups', async () => {
-      const endpoint = `/portaldev/api/groups?project_id=${projectId}`;
+    await test.step('GET /api/groups?project_id={projectId} -> Check Existing Groups', async () => {
+      const endpoint = `/api/groups?project_id=${projectId}`;
       console.log(`[Step 8] Checking existing groups for project...`);
       const response = await apiClient.get(endpoint);
 
@@ -261,13 +261,13 @@ test.describe('Publish Paid BYOK API Product Workflow with Request-Based Plan', 
     });
 
     // Step 9: Create Group (Only When Needed)
-    await test.step('POST /portaldev/api/groups?project_id={projectId} -> Create Group (if missing)', async () => {
+    await test.step('POST /api/groups?project_id={projectId} -> Create Group (if missing)', async () => {
       if (groupId) {
         console.log(`[Step 9] Group already exists (ID: ${groupId}). Skipping creation.`);
         return;
       }
 
-      const endpoint = `/portaldev/api/groups?project_id=${projectId}`;
+      const endpoint = `/api/groups?project_id=${projectId}`;
       const payload = {
         name: "Test Group 1",
         description: "description of API Automation",
@@ -305,11 +305,11 @@ test.describe('Publish Paid BYOK API Product Workflow with Request-Based Plan', 
       console.log(`[Step 10] BYOK Target Service created and OAuth configured successfully. Storing serviceId: ${serviceId}`);
     });
 
-    // Step 10.5: Send PATCH /portaldev/api/projects/{projectId} -> Update with is_byok_enabled = true
-    await test.step('PATCH /portaldev/api/projects/{projectId} -> Enable BYOK', async () => {
+    // Step 10.5: Send PATCH /api/projects/{projectId} -> Update with is_byok_enabled = true
+    await test.step('PATCH /api/projects/{projectId} -> Enable BYOK', async () => {
       expect(projectId).toBeDefined();
 
-      const endpoint = `/portaldev/api/projects/${projectId}`;
+      const endpoint = `/api/projects/${projectId}`;
       const payload = {
         name: uniqueProjectName,
         name_ar: uniqueProjectName,
@@ -350,11 +350,11 @@ test.describe('Publish Paid BYOK API Product Workflow with Request-Based Plan', 
     });
 
     // Step 11: Create Endpoint
-    await test.step('POST /portaldev/api/endpoints?group_id={groupId} -> Create Endpoint', async () => {
+    await test.step('POST /api/endpoints?group_id={groupId} -> Create Endpoint', async () => {
       expect(groupId).toBeDefined();
       expect(serviceId).toBeDefined();
 
-      const endpoint = `/portaldev/api/endpoints?group_id=${groupId}`;
+      const endpoint = `/api/endpoints?group_id=${groupId}`;
       const payload = {
         name: "Test_Endpoint_for_API_Automation",
         description: "Test_Endpoint_for_API_Automation",
@@ -389,8 +389,8 @@ test.describe('Publish Paid BYOK API Product Workflow with Request-Based Plan', 
     });
 
     // Step 12: Get Current Version
-    await test.step('GET /portaldev/api/products/{projectId}/versions?environment=prod -> Get Current Version', async () => {
-      const endpoint = `/portaldev/api/products/${projectId}/versions?environment=prod`;
+    await test.step('GET /api/products/{projectId}/versions?environment=prod -> Get Current Version', async () => {
+      const endpoint = `/api/products/${projectId}/versions?environment=prod`;
       console.log(`[Step 12] Fetching current versions for project...`);
       const response = await apiClient.get(endpoint);
 
@@ -414,7 +414,7 @@ test.describe('Publish Paid BYOK API Product Workflow with Request-Based Plan', 
     });
 
     // Step 13: Submit Version
-    await test.step('POST /portaldev/api/vendor/projects/{projectId}/versions/submit -> Submit Version', async () => {
+    await test.step('POST /api/vendor/projects/{projectId}/versions/submit -> Submit Version', async () => {
       expect(versionId).toBeDefined();
 
       // Log debugging requirements before Submit Version
@@ -425,7 +425,7 @@ test.describe('Publish Paid BYOK API Product Workflow with Request-Based Plan', 
       console.log(`[DEBUG ID Log] pricingPlanId: ${pricingPlanId}`);
       console.log(`[DEBUG ID Log] monetization IDs: ${pricingPlanId}`);
 
-      const endpoint = `/portaldev/api/vendor/projects/${projectId}/versions/submit`;
+      const endpoint = `/api/vendor/projects/${projectId}/versions/submit`;
       const payload = {
         version_id: versionId
       };
@@ -462,11 +462,11 @@ test.describe('Publish Paid BYOK API Product Workflow with Request-Based Plan', 
     });
 
     // Step 15: Publish Version
-    await test.step('POST /portaldev/api/vendor/projects/{projectId}/versions/{versionId}/publish -> Publish Version', async () => {
+    await test.step('POST /api/vendor/projects/{projectId}/versions/{versionId}/publish -> Publish Version', async () => {
       expect(projectId).toBeDefined();
       expect(versionId).toBeDefined();
 
-      const endpoint = `/portaldev/api/vendor/projects/${projectId}/versions/${versionId}/publish`;
+      const endpoint = `/api/vendor/projects/${projectId}/versions/${versionId}/publish`;
       console.log(`[Step 15] Publishing version... Calling POST ${endpoint}`);
       const response = await apiClient.post(endpoint, {});
 
@@ -491,7 +491,7 @@ test.describe('Publish Paid BYOK API Product Workflow with Request-Based Plan', 
       expect(result.success).toBe(true);
 
       // Verify that published became true
-      const getProjectRes = await apiClient.get(`/portaldev/api/projects/${projectId}`);
+      const getProjectRes = await apiClient.get(`/api/projects/${projectId}`);
       expect(getProjectRes.status).toBe(200);
       const project = getProjectRes.body?.data || getProjectRes.body;
       expect(project.published).toBe(true);

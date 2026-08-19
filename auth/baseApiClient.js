@@ -13,6 +13,7 @@ class BaseApiClient {
   constructor(tokenManager) {
     this.tokenManager = tokenManager;
     this.baseUrl = config.baseUrl;
+    this.apiPrefix = config.apiPrefix;
   }
 
   /**
@@ -35,11 +36,43 @@ class BaseApiClient {
       headers['Authorization'] = `Bearer ${token}`;
     }
 
-    return await request.newContext({
+    const context = await request.newContext({
       baseURL: this.baseUrl,
       ignoreHTTPSErrors: true,
       extraHTTPHeaders: headers,
     });
+
+    // Proxy wrapper to rewrite paths starting with /portaldev/api to /portalstg/api in staging
+    const handler = {
+      get(target, propKey, receiver) {
+        const origMethod = target[propKey];
+        if (typeof origMethod === 'function') {
+          if (['get', 'post', 'put', 'delete', 'patch', 'fetch', 'head'].includes(propKey)) {
+            return function (...args) {
+              if (args.length > 0 && typeof args[0] === 'string') {
+                const oldUrl = args[0];
+                let rewritten = false;
+                if (args[0].startsWith('/portaldev/api')) {
+                  args[0] = args[0].replace('/portaldev/api', config.apiPrefix);
+                  rewritten = true;
+                } else if (args[0].startsWith('/api')) {
+                  args[0] = args[0].replace('/api', config.apiPrefix);
+                  rewritten = true;
+                }
+                if (rewritten && oldUrl !== args[0]) {
+                  console.log(`[BaseApiClient Proxy] Rewrote URL: ${oldUrl} -> ${args[0]}`);
+                }
+              }
+              return origMethod.apply(target, args);
+            };
+          }
+          return origMethod.bind(target);
+        }
+        return Reflect.get(target, propKey, receiver);
+      }
+    };
+
+    return new Proxy(context, handler);
   }
 
   /**

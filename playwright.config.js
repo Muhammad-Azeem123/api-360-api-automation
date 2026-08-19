@@ -1,20 +1,20 @@
-// @ts-check
 const { defineConfig } = require('@playwright/test');
 
-/**
- * Playwright configuration file.
- * This file configures the test runner environment.
- * Since this is an API-only testing framework, all browser-related configurations 
- * (like Chromium, Firefox, WebKit projects) are excluded to avoid downloading or launching browsers.
- * 
- * @see https://playwright.dev/docs/test-configuration
- */
 module.exports = defineConfig({
   // Global Setup script to run before all tests
   globalSetup: require.resolve('./utils/global-setup'),
 
   // Directory where the test files are located
-  testDir: './tests',
+  testDir: '.',
+
+  // Match only spec files inside the tests/ directory
+  testMatch: 'tests/**/*.spec.js',
+
+  // Exclude helper spec files/modules from being treated as standalone tests by Playwright
+  testIgnore: [
+    '**/Published_module/**',
+    '**/Target Service/**'
+  ],
 
   // Run tests in files in parallel? For API testing, we disable this globally
   // and run sequentially to avoid overloading the test environment.

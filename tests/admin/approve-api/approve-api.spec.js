@@ -7,7 +7,7 @@ test.describe('Admin > Approve API', () => {
     // Step 1: Call GET /api/admin/versions
     console.log(`----------------------------------------`);
     console.log(`Fetching submitted versions (Page: 1, PageSize: 10)...`);
-    const response = await adminApiClient.get('/portaldev/api/admin/versions?page=1&pageSize=10');
+    const response = await adminApiClient.get('/api/admin/versions?page=1&pageSize=10');
     
     expect(response.status).toBe(200);
     expect(response.body).toBeDefined();
@@ -41,7 +41,7 @@ test.describe('Admin > Approve API', () => {
     
     // Step 3: Approve the version
     console.log(`Approving Version: ${versionId}...`);
-    const approveResponse = await adminApiClient.post(`/portaldev/api/admin/versions/${versionId}/approve`, {});
+    const approveResponse = await adminApiClient.post(`/api/admin/versions/${versionId}/approve`, {});
 
     // If the approval request fails: print status, response body, and fail the test.
     if (approveResponse.status < 200 || approveResponse.status >= 300) {

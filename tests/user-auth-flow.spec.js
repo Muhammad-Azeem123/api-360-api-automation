@@ -77,7 +77,7 @@ test.describe('Authentication & Token Manager Unit Tests', () => {
     expect(token).toBeTruthy();
 
     // 2. Execute GET request using apiClient without any custom headers argument
-    const endpoint = '/portaldev/api/lookups/top-category';
+    const endpoint = '/api/lookups/top-category';
     const response = await apiClient.get(endpoint);
 
     // 3. Verify it still returns 200 OK (meaning token was automatically injected and request succeeded)

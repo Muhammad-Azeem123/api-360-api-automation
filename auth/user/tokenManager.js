@@ -1,5 +1,6 @@
 const BaseTokenManager = require('../baseTokenManager');
 const path = require('path');
+const config = require('../../config/env');
 const refreshToken = require('./refreshToken');
 
 /**
@@ -8,11 +9,19 @@ const refreshToken = require('./refreshToken');
  */
 class UserTokenManager extends BaseTokenManager {
   constructor() {
+    const isStaging = config.env === 'staging';
+    const tokenPath = isStaging
+      ? path.join(__dirname, '../../storage/staging/user-token.json')
+      : path.join(__dirname, '../../storage/user-token.json');
+    const legacyTokenPaths = isStaging
+      ? []
+      : [path.join(__dirname, '../../storage/token.json')];
+
     super({
-      tokenPath: path.join(__dirname, '../../storage/user-token.json'),
+      tokenPath,
       envVarName: 'USER_AUTHORIZATION_TOKEN',
       fallbackEnvVarName: 'AUTHORIZATION_TOKEN',
-      legacyTokenPaths: [path.join(__dirname, '../../storage/token.json')],
+      legacyTokenPaths,
       refreshTokenFunc: refreshToken,
     });
   }

@@ -18,7 +18,7 @@ async function configureEndpointPricingWithTier(projectId, endpointId) {
   }
 
   // Step 1: Verify endpoint exists
-  const endpointsUrl = `/portaldev/api/projects/${projectId}/endpoints`;
+  const endpointsUrl = `${apiClient.apiPrefix}/projects/${projectId}/endpoints`;
   console.log(`[${helperName}] [Step 1] Fetching endpoints from GET ${endpointsUrl}...`);
   const endpointsResponse = await apiClient.get(endpointsUrl);
   console.log(`[${helperName}] [Step 1] Response status: ${endpointsResponse.status}`);
@@ -43,7 +43,7 @@ async function configureEndpointPricingWithTier(projectId, endpointId) {
   console.log(`[${helperName}] [Step 1] Endpoint verification successful. Endpoint ID ${endpointId} exists.`);
 
   // Step 2: Enable Endpoint Pricing
-  const updateSettingsUrl = `/portaldev/api/projects/${projectId}/update-endpoint-pricing-settings`;
+  const updateSettingsUrl = `${apiClient.apiPrefix}/projects/${projectId}/update-endpoint-pricing-settings`;
   const settingsPayload = {
     enable_endpoint_pricing: true
   };
@@ -64,7 +64,7 @@ async function configureEndpointPricingWithTier(projectId, endpointId) {
   console.log(`[${helperName}] [Step 2] Endpoint pricing enabled successfully.`);
 
   // Step 3: Configure Tier Pricing
-  const configurePricingUrl = `/portaldev/api/projects/${projectId}/endpoint-pricing/${endpointId}`;
+  const configurePricingUrl = `${apiClient.apiPrefix}/projects/${projectId}/endpoint-pricing/${endpointId}`;
   const pricingPayload = {
     failure_price: "2",
     endpoint_version_number: 1,

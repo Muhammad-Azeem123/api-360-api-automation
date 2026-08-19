@@ -3,6 +3,8 @@ node_modules/
 
 # Local Environment Variables
 .env
+.env.dev
+.env.stg
 
 # Playwright Test Outputs
 playwright-report/

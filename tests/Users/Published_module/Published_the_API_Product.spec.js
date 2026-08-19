@@ -12,7 +12,7 @@ async function publishAPIProduct(projectId) {
   }
 
   console.log(`[Publish API Product] Fetching project details for ID: ${projectId}...`);
-  const getResponse = await apiClient.get(`/portaldev/api/projects/${projectId}`);
+  const getResponse = await apiClient.get(`${apiClient.apiPrefix}/projects/${projectId}`);
   
   if (getResponse.status !== 200) {
     const errorMsg = `Failed to retrieve project details. HTTP Status: ${getResponse.status}. Body: ${JSON.stringify(getResponse.body)}`;
@@ -62,7 +62,7 @@ async function publishAPIProduct(projectId) {
   };
 
   console.log(`[Publish API Product] Sending PATCH request to publish project ID: ${projectId}...`);
-  const patchResponse = await apiClient.patch(`/portaldev/api/projects/${projectId}`, patchPayload);
+  const patchResponse = await apiClient.patch(`${apiClient.apiPrefix}/projects/${projectId}`, patchPayload);
 
   if (patchResponse.status !== 200 && patchResponse.status !== 204) {
     const errorMsg = `Failed to publish project. HTTP Status: ${patchResponse.status}. Body: ${JSON.stringify(patchResponse.body)}`;
