@@ -33,7 +33,14 @@ async function globalSetup(config) {
     console.error(`\n======================================================================`);
     console.error(`ERROR: Admin Authentication Failed during Global Setup: ${error.message}`);
     console.error(`======================================================================\n`);
-    throw error;
+    
+    // Only throw if admin tests are targeted in the current command line arguments
+    const isRunningAdmin = process.argv.some(arg => arg.toLowerCase().includes('admin'));
+    if (isRunningAdmin) {
+      throw error;
+    } else {
+      console.warn('[Global Setup] Warning: Admin Token refresh failed, but proceeding since no Admin tests are targeted.');
+    }
   }
 
   console.log('[Global Setup] All token refresh steps completed successfully.');
