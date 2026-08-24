@@ -123,7 +123,7 @@ To run these tests locally, you need to configure your local environment variabl
 ## 3. File Responsibilities & Purposes
 
 ### The Authentication Core (`auth/`)
-* **`baseApiClient.js`**: Shared blueprint class defining standard HTTP methods (GET, POST, PUT, DELETE, PATCH). It handles the setup of headers and ensures that request connections are cleanly disposed of.
+* **`baseApiClient.js`**: Shared blueprint class defining standard HTTP methods (GET, POST, PUT, DELETE, PATCH). It automatically handles the setup of headers, disposes of request connections cleanly, and dynamically refreshes expired/invalid Bearer tokens on the fly for self-healing execution.
 * **`baseRefreshToken.js`**: Shared utility function that sends refresh tokens to exchange them for fresh access tokens.
 * **`baseTokenManager.js`**: Master brain class that checks stored tokens, decodes JWTs, and handles automatic refreshing and token storage.
 
@@ -146,6 +146,11 @@ Before executing tests, Playwright runs the setup hook (`utils/global-setup.js`)
 1. **Initialize Environment**: Loads parameters from `.env`.
 2. **Refresh User & Admin Tokens**: Validates current tokens. If expired, it exchanges seeds for active bearer tokens and updates file cache.
 3. **Parity Healing**: Automatically heals any overwritten User storage configurations to prevent active sessions from collapsing during mock test execution.
+
+### Dynamic On-Demand Token Refreshing
+In addition to the Global Setup sequence, the API Client (`auth/baseApiClient.js`) performs a just-in-time check right before initiating any request context. If it detects that the stored User/Admin token is expired or invalid (using the JSON Web Token's `exp` claim check), it dynamically triggers a token refresh behind the scenes. This ensures that:
+- Tests do not fail with `401 Unauthorized` if the environment-level variable `SKIP_GLOBAL_SETUP` is set to `true`.
+- Individual test suites remain self-healing and robust, regardless of when they are executed or how setup parameters are set.
 
 ---
 

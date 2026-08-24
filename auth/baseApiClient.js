@@ -24,7 +24,17 @@ class BaseApiClient {
    * @returns {Promise<import('@playwright/test').APIRequestContext>}
    */
   async getRequestContext(customHeaders = {}) {
-    const token = this.tokenManager.getAccessToken();
+    let token = this.tokenManager.getAccessToken();
+    if (!this.tokenManager.isTokenValid(token)) {
+      console.log(`[BaseApiClient] Active token is expired or invalid. Attempting dynamic refresh...`);
+      try {
+        await this.tokenManager.refresh();
+        token = this.tokenManager.getAccessToken();
+      } catch (err) {
+        console.warn(`[BaseApiClient] Dynamic token refresh failed: ${err.message}`);
+      }
+    }
+
     const headers = {
       'Content-Type': 'application/json',
       'Accept': 'application/json',
