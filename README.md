@@ -38,6 +38,12 @@ playwright-api/
 │
 ├── tests/
 │   ├── Users/
+│   │   ├── Bank/
+│   │   │   └── Connect_bank.spec.js           # Reusable bank account connection flow and validations
+│   │   │
+│   │   ├── Platform Subscription/
+│   │   │   └── Platform-Subscription-of-user.spec.js # E2E Platform Subscription flow and Moyasar 3DS payment integration
+│   │   │
 │   │   ├── Delete API Product/
 │   │   │   └── deleteApiProducts.spec.js      # Cleanup task to delete all API Products/projects
 │   │   │
@@ -135,6 +141,8 @@ To run these tests locally, you need to configure your local environment variabl
 * **`tests/Users/Published_module/Published_the_API_Product.spec.js`**: Reusable module to publish an API Product. It queries project details via GET and submits a PATCH request to set `"published": true`.
 * **`tests/Users/pricing-plan/`**: Reusable modules to configure pricing plans (Package Plan, Request-Based Plan, and Endpoint Pricing with/without tiers) in product creation test runs.
 * **`tests/Users/Delete API Product/deleteApiProducts.spec.js`**: Cleanup task that deletes all API Products/projects from the system. It retrieves all paginated projects, deduplicates project IDs, sends DELETE requests with a reason payload, and skips individual errors.
+* **`tests/Users/Bank/Connect_bank.spec.js`**: Reusable bank account connection flow. It checks if the bank account is already connected, and connects it if not, verifying that duplicate entries are avoided.
+* **`tests/Users/Platform Subscription/Platform-Subscription-of-user.spec.js`**: E2E Platform Subscription flow. Automatically displays plans/tiers, subscribes a user to a selected plan/tier (with console prompts or environment overrides), generates sandbox payment tokens via Moyasar API, programmatically handles redirection & simulated 3DS sandbox card validation over HTTP, and confirms the subscription status is active.
 * **`tests/Users/API-Products/`**: Houses E2E specs for creating both Free and Paid products (BYOK and standard API formats) using the pricing plan helpers, as well as the 10 corresponding `Published_...` specs that automate the full creation sequence followed by final product publication.
 
 ---
@@ -250,3 +258,27 @@ Authentication tokens for each environment are stored in separate directories. R
 
 The global setup script automatically detects the active environment via `ENV=dev` or `ENV=stg`, loads the correct configuration file, and isolates token storage locations. Furthermore, API Client requests automatically route `/portaldev/api` endpoints to `/portalstg/api` when running in the STAGING environment via a dynamic Proxy rewriter, allowing the same test suites to execute against either environment unchanged.
 
+---
+
+## 7. Additional User Workflows
+
+### Bank Account Connection Flow
+This flow verifies the capability to link bank accounts to the platform while ensuring idempotency:
+1. **Query Existing Accounts**: Triggers a `GET /api/bank-accounts` to retrieve all currently connected bank accounts.
+2. **Prevent Duplicates**: Checks if the target account number (e.g. `SA0380000000608010167519`) already exists in the system.
+3. **Establish Connection**: If not found, makes a `POST /api/bank-accounts` with holder name, bank name, and account details to set up the default account.
+
+### Platform Subscription Flow
+This flow automates subscribing a user to a platform billing plan using Moyasar API and programmatically handling 3DS security:
+1. **Fetch & Print Plans**: Pulls available plans via `GET /api/consumer/platform-subscriptions`, printing names, pricing, and tiers.
+2. **Plan/Tier Selection**: Resolves the target subscription plan and tier dynamically (using console inputs or `SELECTED_PLAN_NAME` and `SELECTED_TIER_NAME` environment variables).
+3. **Subscribe**: Submits a `POST /api/consumer/platform-subscriptions/subscribe` to generate an order number.
+4. **Moyasar Token Generation**: Generates a test credit card token via `POST https://api.moyasar.com/v1/tokens`.
+5. **Initiate Payment**: Triggers `POST /api/consumer/platform-subscriptions/payment/initiate` using the generated token and order number.
+6. **3DS Programmatic Authentication Redirection**:
+   - Parses the transaction redirect URL to retrieve the `card_auth` ID.
+   - Submits simulated device details to `https://api.moyasar.com/v1/card_auth/{id}/authenticate`.
+   - Approves the transaction sandbox status by setting `auth_result` to `AUTHENTICATED` via `/set_auth_result`.
+   - Completes session on `/acs_return` to retrieve the payment ID callback URL.
+7. **Payment Confirmation**: Calls `POST /api/consumer/platform-subscriptions/payment/confirm` using the verified payment ID.
+8. **Verify Activation**: Calls `/api/consumer/platform-subscriptions/me` to assert that the status is now `"active"`.
