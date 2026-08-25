@@ -28,7 +28,7 @@ test.describe('Add KYC and Admin Approval Flow', () => {
       (detailsResponse.body.id || (detailsResponse.body.data && detailsResponse.body.data.id));
 
     if (hasExistingKyc) {
-      console.log('[Step 0] KYC details are already present and Approved. No need to add or update. Exiting test successfully.');
+      console.log('[Step 0] KYC details are already present and Approved by Admin. No need to add or update. Exiting test successfully.');
       return;
     } else {
       console.log('[Step 0] KYC details are not present. Proceeding to submit a new KYC request...');

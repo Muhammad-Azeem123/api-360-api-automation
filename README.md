@@ -41,6 +41,9 @@ playwright-api/
 │   │   ├── Bank/
 │   │   │   └── Connect_bank.spec.js           # Reusable bank account connection flow and validations
 │   │   │
+│   │   ├── KYC/
+│   │   │   └── Add_kyc.spec.js                # E2E KYC/KYB submission (idempotent check) and Admin Approval flow
+│   │   │
 │   │   ├── Platform Subscription/
 │   │   │   └── Platform-Subscription-of-user.spec.js # E2E Platform Subscription flow and Moyasar 3DS payment integration
 │   │   │
@@ -142,6 +145,7 @@ To run these tests locally, you need to configure your local environment variabl
 * **`tests/Users/pricing-plan/`**: Reusable modules to configure pricing plans (Package Plan, Request-Based Plan, and Endpoint Pricing with/without tiers) in product creation test runs.
 * **`tests/Users/Delete API Product/deleteApiProducts.spec.js`**: Cleanup task that deletes all API Products/projects from the system. It retrieves all paginated projects, deduplicates project IDs, sends DELETE requests with a reason payload, and skips individual errors.
 * **`tests/Users/Bank/Connect_bank.spec.js`**: Reusable bank account connection flow. It checks if the bank account is already connected, and connects it if not, verifying that duplicate entries are avoided.
+* **`tests/Users/KYC/Add_kyc.spec.js`**: E2E KYC submission and approval flow. It queries the consumer KYC details status, skipping the workflow if it is already present and approved, or submitting and approving the KYC request via the Admin API if it is not present.
 * **`tests/Users/Platform Subscription/Platform-Subscription-of-user.spec.js`**: E2E Platform Subscription flow. Automatically displays plans/tiers, subscribes a user to a selected plan/tier (with console prompts or environment overrides), generates sandbox payment tokens via Moyasar API, programmatically handles redirection & simulated 3DS sandbox card validation over HTTP, and confirms the subscription status is active.
 * **`tests/Users/API-Products/`**: Houses E2E specs for creating both Free and Paid products (BYOK and standard API formats) using the pricing plan helpers, as well as the 10 corresponding `Published_...` specs that automate the full creation sequence followed by final product publication.
 
@@ -282,3 +286,9 @@ This flow automates subscribing a user to a platform billing plan using Moyasar 
    - Completes session on `/acs_return` to retrieve the payment ID callback URL.
 7. **Payment Confirmation**: Calls `POST /api/consumer/platform-subscriptions/payment/confirm` using the verified payment ID.
 8. **Verify Activation**: Calls `/api/consumer/platform-subscriptions/me` to assert that the status is now `"active"`.
+
+### KYC Submission & Approval Flow
+This workflow automates the consumer KYC/KYB submission and administrative approval:
+1. **Check Existing Status**: Queries `GET /portaldev/api/consumer/kyc-kyb/kyc-details`. If KYC details are already present and approved by Admin, the test logs a message and exits early to ensure idempotency.
+2. **Submit KYC**: If not present, makes a `POST /portaldev/api/consumer/kyc-kyb/kyc` with user details (username, email, national ID, mobile, etc.).
+3. **Admin Approval**: Fetches the KYC request list via the Admin GET endpoint, matches it by ID or email, extracts the `profile_id`, and sends a `PATCH` request to `/api/admin/kyc-kyb/{kycId}/profile/{profileId}` to transition status to `COMPLETED`.
