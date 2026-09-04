@@ -1,0 +1,106 @@
+===============================================================================
+                         API 360 - TEST RUN COMMANDS
+===============================================================================
+
+-------------------------------------------------------------------------------
+1. FREE API PRODUCTS
+-------------------------------------------------------------------------------
+# 1. Free API Product (Creation -> Approval -> Publish)
+npx playwright test "tests/Users/API-Products/Free-API-product/Free_API_Product.spec.js"
+
+# 2. Published Free API Product (Draft -> Publish Flow)
+npx playwright test "tests/Users/API-Products/Free-API-product/Published_Free_API_Product.spec.js"
+
+
+-------------------------------------------------------------------------------
+2. FREE BYOK (BRING YOUR OWN KEY) PRODUCTS
+-------------------------------------------------------------------------------
+# 1. Free BYOK Product (Creation -> Target Service -> OAuth Config -> Approval -> Publish)
+npx playwright test "tests/Users/API-Products/Free BYOK Product/Free_BYOK_Product.spec.js"
+
+# 2. Published Free BYOK Product (Draft -> Publish Flow)
+npx playwright test "tests/Users/API-Products/Free BYOK Product/Published_Free_BYOK_Product.spec.js"
+
+
+-------------------------------------------------------------------------------
+3. PAID API PRODUCTS
+-------------------------------------------------------------------------------
+# 1. Endpoint Pricing (No Tier)
+npx playwright test "tests/Users/API-Products/Paid-API-product/Paid_API_Product_Endpoint_Pricing_No_Tier.spec.js"
+
+# 2. Endpoint Pricing (With Tiers)
+npx playwright test "tests/Users/API-Products/Paid-API-product/Paid_API_Product_Endpoint_Pricing_Tier.spec.js"
+
+# 3. Request-Based Plan
+npx playwright test "tests/Users/API-Products/Paid-API-product/Paid_API_Product_Request_Based_Plan.spec.js"
+
+# 4. Plan as a Package
+npx playwright test "tests/Users/API-Products/Paid-API-product/Paid_API_Product_with_plan-as-package.spec.js"
+
+# 5. Published Endpoint Pricing (No Tier)
+npx playwright test "tests/Users/API-Products/Paid-API-product/Published_Paid_API_Product_Endpoint_Pricing_No_Tier.spec.js"
+
+# 6. Published Endpoint Pricing (With Tiers)
+npx playwright test "tests/Users/API-Products/Paid-API-product/Published_Paid_API_Product_Endpoint_Pricing_Tier.spec.js"
+
+# 7. Published Request-Based Plan
+npx playwright test "tests/Users/API-Products/Paid-API-product/Published_Paid_API_Product_Request_Based_Plan.spec.js"
+
+# 8. Published Plan as a Package
+npx playwright test "tests/Users/API-Products/Paid-API-product/Published_Paid_API_Product_Plan_As_A_Package.spec.js"
+
+
+-------------------------------------------------------------------------------
+4. PAID BYOK PRODUCTS
+-------------------------------------------------------------------------------
+# 1. Paid BYOK - Endpoint Pricing (No Tier)
+npx playwright test "tests/Users/API-Products/Paid BYOK Product/Paid-BYOK-Product-endpoint-pricing-no-tier.spec.js"
+
+# 2. Paid BYOK - Endpoint Pricing (With Tiers)
+npx playwright test "tests/Users/API-Products/Paid BYOK Product/Paid-BYOK-Product-endpoint-pricing-tier.spec.js"
+
+# 3. Paid BYOK - Plan Based on Number of Requests
+npx playwright test "tests/Users/API-Products/Paid BYOK Product/Paid-BYOK-Product-plan-base-on-No.-of-request.spec.js"
+
+# 4. Paid BYOK - Plan as a Package
+npx playwright test "tests/Users/API-Products/Paid BYOK Product/Paid-BYOK-Product-plan-as-a-package.spec.js"
+
+# 5. Published Paid BYOK - Endpoint Pricing (No Tier)
+npx playwright test "tests/Users/API-Products/Paid BYOK Product/Published_Paid_BYOK_Product_Endpoint_Pricing_No_Tier.spec.js"
+
+# 6. Published Paid BYOK - Endpoint Pricing (With Tiers)
+npx playwright test "tests/Users/API-Products/Paid BYOK Product/Published_Paid_BYOK_Product_Endpoint_Pricing_Tier.spec.js"
+
+# 7. Published Paid BYOK - Plan Based on Number of Requests
+npx playwright test "tests/Users/API-Products/Paid BYOK Product/Published_Paid_BYOK_Product_Plan_Based_On_Number_Of_Requests.spec.js"
+
+# 8. Published Paid BYOK - Plan as a Package
+npx playwright test "tests/Users/API-Products/Paid BYOK Product/Published_Paid_BYOK_Product_Plan_As_A_Package.spec.js"
+
+
+-------------------------------------------------------------------------------
+5. RUNNING BY CATEGORY / ENTIRE FOLDERS
+-------------------------------------------------------------------------------
+# Run all Free API Product tests
+npx playwright test "tests/Users/API-Products/Free-API-product"
+
+# Run all Free BYOK Product tests
+npx playwright test "tests/Users/API-Products/Free BYOK Product"
+
+# Run all Paid API Product tests
+npx playwright test "tests/Users/API-Products/Paid-API-product"
+
+# Run all Paid BYOK Product tests
+npx playwright test "tests/Users/API-Products/Paid BYOK Product"
+
+
+-------------------------------------------------------------------------------
+6. RUNNING ALL API PRODUCT TESTS SEQUENTIALLY
+-------------------------------------------------------------------------------
+npx playwright test "tests/Users/API-Products"
+
+
+-------------------------------------------------------------------------------
+7. VIEWING HTML TEST REPORT
+-------------------------------------------------------------------------------
+npx playwright show-report

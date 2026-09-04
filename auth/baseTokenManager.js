@@ -120,10 +120,11 @@ class BaseTokenManager {
    * 
    * @param {object} tokensData
    */
-  saveTokens(tokensData) {
+  saveTokens(tokensData, envSeed = '') {
     const accessToken = this.sanitizeToken(tokensData.accessToken);
     const refreshToken = this.sanitizeToken(tokensData.refreshToken);
     const { expiresIn, refreshExpiresIn } = tokensData;
+    const existing = this.loadTokens();
     
     const dir = path.dirname(this.tokenPath);
     if (!fs.existsSync(dir)) {
@@ -135,6 +136,7 @@ class BaseTokenManager {
       refreshToken,
       expiresIn,
       refreshExpiresIn,
+      envSeed: envSeed || existing?.envSeed || '',
       success: true,
       message: 'Token refreshed successfully',
       data: {
@@ -192,8 +194,10 @@ class BaseTokenManager {
    */
   async refresh() {
     this.cache = null; // force cache reload from disk
-    const storedAccess = this.getAccessToken();
-    const storedRefresh = this.getRefreshToken();
+    const storedData = this.loadTokens();
+    const storedAccess = this.sanitizeToken(storedData?.accessToken || storedData?.data?.token?.access_token);
+    const storedRefresh = this.sanitizeToken(storedData?.refreshToken || storedData?.data?.token?.refresh_token);
+    const storedEnvSeed = this.sanitizeToken(storedData?.envSeed);
 
     const config = require('../config/env');
     const authConfig = require('../auth.config');
@@ -208,20 +212,14 @@ class BaseTokenManager {
     let tokenToUse = '';
     let isUsingEnvSeed = false;
 
-    const isEnvTokenNew = envToken && envToken !== storedAccess && envToken !== storedRefresh;
-
-    if (isEnvTokenNew) {
-      console.log(`[TokenManager] New token detected in .env configuration. Forcing refresh using this token.`);
-      tokenToUse = envToken;
-      isUsingEnvSeed = true;
-    } else if (storedAccess && this.isTokenValid(storedAccess)) {
+    if (storedAccess && this.isTokenValid(storedAccess)) {
       console.log(`[TokenManager] Valid access token found in ${this.tokenPath}. Skipping refresh.`);
       return;
     } else if (storedRefresh && this.isTokenValid(storedRefresh)) {
-      console.log(`[TokenManager] Stored access token is expired, but stored refresh token is valid. Attempting refresh.`);
+      console.log(`[TokenManager] Stored access token is expired/missing, but stored refresh token is valid. Attempting refresh.`);
       tokenToUse = storedRefresh;
     } else if (envToken) {
-      console.log(`[TokenManager] No valid stored tokens found. Falling back to env seed token (${this.envVarName}).`);
+      console.log(`[TokenManager] No valid stored tokens found. Using env seed token (${this.envVarName}).`);
       tokenToUse = envToken;
       isUsingEnvSeed = true;
     }
@@ -232,7 +230,7 @@ class BaseTokenManager {
 
     try {
       const refreshedTokens = await this.refreshTokenFunc(tokenToUse, isUsingEnvSeed);
-      this.saveTokens(refreshedTokens);
+      this.saveTokens(refreshedTokens, isUsingEnvSeed ? envToken : storedEnvSeed);
     } catch (error) {
       if (error.message.includes('expired or is invalid') || error.message.includes('Please paste a fresh token')) {
         throw error;

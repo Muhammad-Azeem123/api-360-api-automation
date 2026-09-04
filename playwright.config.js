@@ -10,6 +10,9 @@ module.exports = defineConfig({
   // Match only spec files inside the tests/ directory
   testMatch: 'tests/**/*.spec.js',
 
+  // Overall test timeout (60 seconds to allow full 15-step API workflows and approval cycles)
+  timeout: 60000,
+
   // Exclude helper spec files/modules from being treated as standalone tests by Playwright
   testIgnore: [
     '**/Published_module/**',

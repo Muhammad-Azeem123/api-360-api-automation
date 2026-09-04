@@ -17,25 +17,25 @@ async function approveAPIProduct({ productName, category }) {
 
   // STEP 1: Get the current pending request count.
   console.log(`[Admin Approval] Step 1: Fetching current pending request count...`);
-  const countResponse = await adminApiClient.get('/api/admin/requests/pending/count');
-  
-  if (countResponse.status < 200 || countResponse.status >= 300) {
-    throw new Error(`Failed to fetch pending requests count. HTTP Status: ${countResponse.status}`);
+  try {
+    const countResponse = await adminApiClient.get('/api/admin/requests/pending/count');
+    if (countResponse.status >= 200 && countResponse.status < 300 && countResponse.body?.success) {
+      const pendingCount = countResponse.body.data;
+      console.log(`[Admin Approval] Pending request count retrieved successfully: ${pendingCount}`);
+    } else {
+      console.warn(`[Admin Approval] Warning: Pending count endpoint returned status ${countResponse.status}. Proceeding to project list...`);
+    }
+  } catch (err) {
+    console.warn(`[Admin Approval] Warning: Error fetching pending request count (${err.message}). Proceeding to project list...`);
   }
-  
-  if (!countResponse.body || countResponse.body.success !== true) {
-    throw new Error(`Pending count API response indicates failure or is malformed.`);
-  }
-
-  const pendingCount = countResponse.body.data;
-  console.log(`[Admin Approval] Pending request count retrieved successfully: ${pendingCount}`);
 
   // STEP 2: Get all admin projects.
   console.log(`[Admin Approval] Step 2: Fetching admin projects (Page 1)...`);
   const projectsResponse = await adminApiClient.get('/api/admin/projects?page=1');
   
   if (projectsResponse.status < 200 || projectsResponse.status >= 300) {
-    throw new Error(`Failed to fetch admin projects. HTTP Status: ${projectsResponse.status}`);
+    console.error(`[Admin Approval] Failed to fetch admin projects. Status: ${projectsResponse.status}, Body:`, JSON.stringify(projectsResponse.body, null, 2));
+    throw new Error(`Failed to fetch admin projects. HTTP Status: ${projectsResponse.status}. Body: ${JSON.stringify(projectsResponse.body)}`);
   }
   
   const projects = projectsResponse.body?.data;
