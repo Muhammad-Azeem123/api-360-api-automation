@@ -8,7 +8,37 @@ const approveAPIProduct = require('../../../admin/Approve_API_Product/approveAPI
 const categoryName = 'Test Azy';
 const prefixBase = 'apiworkflow';
 const pricingPlan = 'Request-Based Plan';
-const projectName = `Paid API Product - ${pricingPlan}`;
+const projectName = `Paid_API_Product_${pricingPlan.replace(/[\s-]+/g, '_')}`;
+
+/**
+ * Validates a project name string against the API Product Name rules.
+ * 
+ * Rules:
+ * 1. Only letters (a-z, A-Z), numbers (0-9), and characters (., -, _, ~) are allowed.
+ * 2. Cannot start with ., -, _, or ~.
+ * 3. Cannot end with ., -, _, or ~.
+ * 4. No spaces or other special characters allowed.
+ * 5. The field is required.
+ * 
+ * @param {string} name
+ * @returns {{ valid: boolean, message?: string }}
+ */
+function validateProjectName(name) {
+  if (!name || typeof name !== 'string' || name.trim() === '') {
+    return { valid: false, message: 'The project name field is required.' };
+  }
+  const specialChars = ['.', '-', '_', '~'];
+  if (specialChars.includes(name[0])) {
+    return { valid: false, message: 'The project name cannot start with one of . - _ ~' };
+  }
+  if (specialChars.includes(name[name.length - 1])) {
+    return { valid: false, message: 'The project name cannot end with one of . - _ ~' };
+  }
+  if (!/^[a-zA-Z0-9._~-]+$/.test(name)) {
+    return { valid: false, message: 'Only letters, numbers, and the characters . - _ ~ are allowed.' };
+  }
+  return { valid: true };
+}
 
 /**
  * Validates a prefix string against the API URL Prefix rules.
@@ -88,7 +118,7 @@ test.describe('Publish Paid API Product Workflow with Request-Based Plan', () =>
 
     // Step 2: Validate prefix validation rules and check prefix availability
     await test.step('GET /api/projects/check-prefix -> Generate & validate prefix', async () => {
-      console.log(`[Step 2] Testing prefix validation helper against rules...`);
+      console.log(`[Step 2] Testing prefix and project name validation helpers against rules...`);
 
       // Verify validation rules on invalid test cases to ensure correct validation behavior
       expect(validatePrefix('').valid).toBe(false); // required
@@ -99,6 +129,19 @@ test.describe('Publish Paid API Product Workflow with Request-Based Plan', () =>
       expect(validatePrefix('Invalid').valid).toBe(false); // uppercase
       expect(validatePrefix('in valid').valid).toBe(false); // spaces
       expect(validatePrefix('invalid$').valid).toBe(false); // special char
+
+      // Verify project name validation rules
+      expect(validateProjectName('').valid).toBe(false);
+      expect(validateProjectName('.invalid').valid).toBe(false);
+      expect(validateProjectName('-invalid').valid).toBe(false);
+      expect(validateProjectName('_invalid').valid).toBe(false);
+      expect(validateProjectName('~invalid').valid).toBe(false);
+      expect(validateProjectName('invalid.').valid).toBe(false);
+      expect(validateProjectName('invalid-').valid).toBe(false);
+      expect(validateProjectName('invalid_').valid).toBe(false);
+      expect(validateProjectName('invalid~').valid).toBe(false);
+      expect(validateProjectName('invalid space').valid).toBe(false);
+      expect(validateProjectName('invalid@symbol').valid).toBe(false);
 
       // Generate a dynamic, guaranteed-unique prefix
       prefix = `${prefixBase}-${Date.now()}`;
@@ -128,7 +171,9 @@ test.describe('Publish Paid API Product Workflow with Request-Based Plan', () =>
       expect(categoryId).toBeDefined();
       expect(prefix).toBeDefined();
 
-      uniqueProjectName = `${projectName} ${Date.now()}`;
+      uniqueProjectName = `${projectName}_${Date.now()}`;
+      expect(validateProjectName(uniqueProjectName).valid).toBe(true);
+
       const payload = {
         name: uniqueProjectName,
         name_ar: uniqueProjectName,
